@@ -62,6 +62,59 @@ body {
   min-height: 100vh;
 }
 
+/* ─── Mobile top bar + drawer (hidden on desktop) ── */
+.app-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  z-index: 160;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  background: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-topbar-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 38px; height: 38px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-2);
+  border-radius: 9px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.app-topbar-toggle span {
+  display: block;
+  height: 2px; width: 100%;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+body.drawer-open .app-topbar-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+body.drawer-open .app-topbar-toggle span:nth-child(2) { opacity: 0; }
+body.drawer-open .app-topbar-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.app-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.3px;
+}
+
+.drawer-overlay { display: none; }
+
 /* ─── Sidebar ──────────────────────────── */
 .sidebar {
   position: fixed;
@@ -1508,19 +1561,33 @@ body {
 }
 
 @media (max-width: 900px) {
-  :root { --sidebar-w: 64px; }
+  /* Sidebar becomes an off-canvas drawer; content goes full width */
+  .app-topbar { display: flex; }
 
-  .brand-name, .brand-tag,
-  .nav-item > span:last-child,
-  .nav-section-label,
-  .user-meta, .user-email, .user-role,
-  .sidebar-action > span { display: none; }
+  .sidebar {
+    top: 56px;
+    height: calc(100dvh - 56px);
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+  }
+  body.drawer-open .sidebar { transform: translateX(0); }
 
-  .sidebar-brand { justify-content: center; padding: 18px 0; }
-  .nav-item { justify-content: center; padding: 12px; }
-  .sidebar-footer { padding: 10px 8px; }
-  .sidebar-action { justify-content: center; }
-  .user-row { justify-content: center; padding: 8px; }
+  .drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  body.drawer-open .drawer-overlay { opacity: 1; pointer-events: auto; }
+  body.drawer-open { overflow: hidden; }
+
+  .main-content { margin-left: 0; padding-top: 56px; }
+
   .page-header { padding: 20px 16px; flex-wrap: wrap; gap: 12px; }
   .scan-bar-wrap { padding: 16px 16px 0; }
   .scanner-grid { padding: 12px 16px 24px; }
@@ -1543,6 +1610,36 @@ body {
   .scan-bar-btn { padding: 0 16px; min-height: 50px; }
   .result-hero { flex-direction: column; align-items: stretch; gap: 18px; }
   .gauge { align-self: center; }
+
+  /* History table -> stacked cards */
+  .table-card { overflow-x: visible; }
+  .data-table { min-width: 0; }
+  .data-table thead { display: none; }
+  .data-table, .data-table tbody { display: block; }
+  .table-row { display: block; padding: 12px 16px; }
+  .data-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 0;
+  }
+  .data-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    flex-shrink: 0;
+  }
+  .td-url { align-items: flex-start; }
+  .url-cell { align-items: flex-end; text-align: right; }
+  .url-path { max-width: 210px; }
+  .conf-cell { justify-content: flex-end; }
+  .td-date { color: var(--text-2); }
+  .td-dt { text-align: right; }
+  .td-time { display: inline; margin-left: 6px; color: var(--text-3); }
 }
 
 @media (max-width: 440px) {

@@ -3,6 +3,28 @@
 // CSRF token (rendered into the page <head> by Flask-WTF).
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || "";
 
+// ── Mobile sidebar drawer ────────────────────────────────
+(() => {
+  const toggle  = document.getElementById("drawer-toggle");
+  const overlay = document.getElementById("drawer-overlay");
+  if (!toggle) return;
+  const setDrawer = (open) => {
+    document.body.classList.toggle("drawer-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+  toggle.addEventListener("click", () =>
+    setDrawer(!document.body.classList.contains("drawer-open"))
+  );
+  overlay?.addEventListener("click", () => setDrawer(false));
+  // Close after tapping a nav link, and on Escape
+  document.querySelectorAll(".sidebar .nav-item").forEach((a) =>
+    a.addEventListener("click", () => setDrawer(false))
+  );
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setDrawer(false);
+  });
+})();
+
 // ── DOM refs ─────────────────────────────────────────────
 const scanForm        = document.getElementById("scan-form");
 const urlInput        = document.getElementById("url-input");

@@ -43,7 +43,19 @@
       Launch App
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
+    <button class="lp-nav-toggle" id="lp-nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="lp-mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
+
+  <!-- Mobile dropdown menu -->
+  <nav class="lp-mobile-menu" id="lp-mobile-menu" aria-label="Mobile navigation">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#security">Security</a>
+    <a href="{{ url_for('auth.login') }}">Sign in</a>
+    <a href="{{ url_for('scanner.index') }}" class="lp-mobile-cta">Launch App</a>
+  </nav>
 </header>
 
 <!-- ── Hero ── -->

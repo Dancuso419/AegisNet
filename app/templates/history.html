@@ -30,13 +30,13 @@
       <tbody>
         {% for scan in scans %}
         <tr class="table-row">
-          <td class="td-url">
+          <td class="td-url" data-label="URL">
             <div class="url-cell">
               <div class="url-scheme">{{ scan.url.split('://')[0] }}://</div>
               <div class="url-path" title="{{ scan.url }}">{{ scan.url.split('://')[-1] }}</div>
             </div>
           </td>
-          <td>
+          <td data-label="Verdict">
             <span class="verdict-pill verdict-pill--{{ 'danger' if scan.verdict == 'Phishing' else 'safe' }}">
               {% if scan.verdict == 'Phishing' %}
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -50,7 +50,7 @@
               {{ scan.verdict }}
             </span>
           </td>
-          <td>
+          <td data-label="Confidence">
             <div class="conf-cell">
               <div class="conf-bar">
                 <div class="conf-fill conf-fill--{{ 'danger' if scan.verdict == 'Phishing' else 'safe' }}"
@@ -59,7 +59,7 @@
               <span class="conf-num">{{ scan.confidence }}%</span>
             </div>
           </td>
-          <td class="td-date">{{ scan.timestamp.strftime('%b %d, %Y') }}<span class="td-time">{{ scan.timestamp.strftime('%H:%M') }}</span></td>
+          <td class="td-date" data-label="Date"><span class="td-dt">{{ scan.timestamp.strftime('%b %d, %Y') }}<span class="td-time">{{ scan.timestamp.strftime('%H:%M') }}</span></span></td>
         </tr>
         {% endfor %}
       </tbody>
