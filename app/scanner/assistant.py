@@ -1,5 +1,8 @@
+import logging
 import google.generativeai as genai
 from flask import current_app
+
+logger = logging.getLogger(__name__)
 
 # Bound every Gemini call so a slow or rate-limited request falls back
 # quickly instead of hanging the /scan request for 20-30s. A plain
@@ -78,7 +81,8 @@ def get_explanation(scan_context: dict) -> str:
             request_options=_REQUEST_OPTIONS,
         )
         return response.text
-    except Exception:
+    except Exception as e:
+        logger.error("Gemini get_explanation failed: %s", e, exc_info=True)
         return FALLBACK
 
 
@@ -92,5 +96,6 @@ def chat(user_message: str, scan_context: dict | None) -> str:
             request_options=_REQUEST_OPTIONS,
         )
         return response.text
-    except Exception:
+    except Exception as e:
+        logger.error("Gemini chat failed: %s", e, exc_info=True)
         return FALLBACK
