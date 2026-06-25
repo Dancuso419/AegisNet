@@ -19,6 +19,20 @@ SUSPICIOUS_TLDS = [
     ".top", ".club", ".online", ".site", ".icu"
 ]
 
+POPULAR_BRANDS = [
+    "google", "facebook", "paypal", "amazon", "apple", "microsoft",
+    "netflix", "instagram", "twitter", "linkedin", "dropbox", "yahoo",
+    "gmail", "outlook", "chase", "wellsfargo", "bankofamerica", "ebay",
+    "whatsapp", "youtube", "tiktok", "snapchat", "reddit", "spotify",
+]
+
+# Maps visually similar digits/symbols to the letters they impersonate
+_HOMOGLYPH_TABLE = str.maketrans("013456@", "oieasgba"[:-1], "")
+_HOMOGLYPH_TABLE = str.maketrans({
+    "0": "o", "1": "i", "3": "e", "4": "a",
+    "5": "s", "6": "g", "@": "a",
+})
+
 
 def _is_ip(hostname: str) -> int:
     try:
@@ -31,6 +45,29 @@ def _is_ip(hostname: str) -> int:
         return 1
     except (socket.error, OSError):
         return 0
+
+
+def _has_brand_impersonation(hostname: str) -> int:
+    clean = hostname.lower().replace("www.", "")
+    parts = clean.split(".")
+    # Check the second-level domain (e.g. "faceb0ok" from "faceb0ok.com")
+    domain_name = parts[-2] if len(parts) >= 2 else clean
+
+    normalized = domain_name.translate(_HOMOGLYPH_TABLE)
+
+    for brand in POPULAR_BRANDS:
+        # Homoglyph match: normalised equals brand but original didn't
+        if normalized == brand and domain_name != brand:
+            return 1
+        # Brand embedded in longer string: paypal-secure, amazon-login, etc.
+        if brand in normalized and normalized != brand:
+            return 1
+        # Subdomain spoofing: paypal.evil.com — brand appears before last two parts
+        for part in parts[:-2]:
+            if brand in part.translate(_HOMOGLYPH_TABLE):
+                return 1
+
+    return 0
 
 
 def _whois_info(domain: str):
@@ -127,6 +164,8 @@ def extract_features(url: str) -> dict:
     domain = ".".join(parts[-2:]) if len(parts) >= 2 else hostname
     domain_age_days, domain_registration_length, whois_success = _whois_info(domain)
 
+    has_brand_impersonation = _has_brand_impersonation(hostname)
+
     return {
         "url_length": url_length,
         "hostname_length": hostname_length,
@@ -152,4 +191,5 @@ def extract_features(url: str) -> dict:
         "domain_age_days": domain_age_days,
         "domain_registration_length": domain_registration_length,
         "whois_success": whois_success,
+        "has_brand_impersonation": has_brand_impersonation,
     }

@@ -21,6 +21,7 @@ FEATURE_COLUMNS = [
     "is_shortened", "has_suspicious_keyword", "has_port", "longest_word_length",
     "num_digits", "digit_ratio", "has_double_slash_path", "suspicious_tld",
     "domain_age_days", "domain_registration_length", "whois_success",
+    "has_brand_impersonation",
 ]
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "model.pkl")
@@ -51,43 +52,153 @@ def load_dataset():
 
 def _generate_synthetic_data():
     """
-    Generates a minimal synthetic dataset when no real CSV is available.
-    Replace with a real dataset (e.g. PhishTank, ISCX-URL-2016) for production.
+    Generates a diverse synthetic dataset covering a wide range of phishing
+    patterns including homoglyph attacks, brand impersonation, subdomain abuse,
+    suspicious TLDs, IP-based URLs, and URL shorteners.
     """
     np.random.seed(42)
-    n = 2000
 
     legit_urls = [
-        "https://www.google.com/search?q=hello",
-        "https://github.com/user/repo",
-        "https://stackoverflow.com/questions/12345",
-        "https://en.wikipedia.org/wiki/Python",
-        "https://docs.python.org/3/library/urllib.html",
-    ]
-    phish_urls = [
-        "http://192.168.1.1/login/verify/account",
-        "http://secure-banking-update.tk/signin?user=123",
-        "http://bit.ly/3xAbCdE",
-        "http://paypa1-confirm-account.xyz/webscr",
-        "http://login.verify.secure-account.ml/password",
+        # Major tech
+        "https://www.google.com/search?q=python+tutorial",
+        "https://www.google.com/maps/place/Lagos",
+        "https://mail.google.com/mail/u/0/",
+        "https://drive.google.com/drive/my-drive",
+        "https://github.com/torvalds/linux",
+        "https://github.com/python/cpython/issues",
+        "https://stackoverflow.com/questions/11227809",
+        "https://stackoverflow.com/tags/python",
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+        "https://docs.python.org/3/library/re.html",
+        "https://en.wikipedia.org/wiki/Phishing",
+        "https://en.wikipedia.org/wiki/Machine_learning",
+        # Social / media
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://www.youtube.com/results?search_query=flask+tutorial",
+        "https://www.reddit.com/r/learnpython/",
+        "https://www.reddit.com/r/netsec/",
+        "https://twitter.com/home",
+        "https://www.linkedin.com/in/sample-profile/",
+        "https://www.instagram.com/explore/",
+        # E-commerce
+        "https://www.amazon.com/dp/B08N5WRWNW",
+        "https://www.amazon.com/s?k=laptop",
+        "https://www.ebay.com/itm/123456789",
+        "https://www.ebay.com/sch/i.html?_nkw=headphones",
+        # Banking / finance (legit)
+        "https://www.chase.com/personal/banking",
+        "https://www.wellsfargo.com/mortgage/",
+        "https://www.paypal.com/myaccount/summary",
+        "https://www.paypal.com/us/webapps/mpp/home",
+        # News / info
+        "https://www.bbc.com/news/technology",
+        "https://www.reuters.com/technology/",
+        "https://techcrunch.com/category/security/",
+        # Developer tools
+        "https://www.npmjs.com/package/express",
+        "https://pypi.org/project/flask/",
+        "https://hub.docker.com/_/python",
+        "https://docs.aws.amazon.com/ec2/",
+        # African domains (relevant to your context)
+        "https://www.gtbank.com/personal-banking",
+        "https://www.zenithbank.com/personal-banking/",
+        "https://www.accessbankplc.com/",
+        "https://www.uba.africa/",
     ]
 
-    # Extract features once per unique URL, then replicate rows
+    phish_urls = [
+        # Homoglyph / typosquatting attacks
+        "https://www.faceb0ok.com/login",
+        "https://www.faceb00k.com/verify",
+        "https://www.facebook-login.com/signin",
+        "https://www.paypa1.com/signin",
+        "https://www.paypa1-secure.com/account/verify",
+        "https://www.paypalsecure-login.com/webscr",
+        "https://www.g00gle.com/account/login",
+        "https://www.googie.com/signin",
+        "https://www.amaz0n.com/signin",
+        "https://www.amazon-secure.com/account/update",
+        "https://www.arnazon.com/login",
+        "https://www.rn icrosoft.com/login".replace(" ", ""),
+        "https://www.micros0ft.com/verify",
+        "https://www.app1e.com/account/signin",
+        "https://www.apple-id-verify.com/account",
+        "https://www.netfl1x.com/login",
+        "https://www.netflix-billing.com/account/update",
+        # Subdomain spoofing
+        "http://paypal.secure-login.com/signin",
+        "http://amazon.account-update.com/verify",
+        "http://apple.id-verify.com/account",
+        "http://google.accounts-signin.com/auth",
+        "http://chase.bank-secure.com/login",
+        "http://wellsfargo.account-alert.com/verify",
+        # Suspicious TLDs
+        "http://secure-banking-update.tk/signin?user=123",
+        "http://login-verify-account.ml/confirm",
+        "http://account-suspended.ga/reactivate",
+        "http://free-gift-claim.cf/win?user=victim",
+        "http://paypal-refund.gq/claim",
+        "http://amazon-prize.xyz/claim?id=12345",
+        "http://verify-account.top/login",
+        "http://bank-alert.club/secure",
+        "http://update-billing.online/paypal",
+        "http://account-verify.site/login",
+        "http://win-prize.icu/claim",
+        # IP-based URLs
+        "http://192.168.1.1/login/verify/account",
+        "http://10.0.0.1/banking/signin",
+        "http://185.220.101.45/paypal/login",
+        "http://193.238.46.120/apple/verify",
+        "http://45.142.212.100/amazon/account",
+        # URL shorteners leading to phishing
+        "http://bit.ly/3xAbCdE",
+        "http://tinyurl.com/phishlink",
+        "http://t.co/fakeredirect",
+        "http://ow.ly/scamlink",
+        "http://is.gd/phish123",
+        # Long suspicious URLs with many parameters
+        "http://paypa1-confirm-account.xyz/webscr?cmd=login&dispatch=5885d80a13c0db1f8e263663d3faee8d&locale=en_US",
+        "http://login.verify.secure-account.ml/password?redirect=https://paypal.com&token=abc123",
+        "http://secure.amazon-account-alert.com/gp/signin?openid=1&siteState=clientContext&pageId=usflex",
+        "http://appleid.apple.com.verify-account.ml/signin?returnUrl=https://apple.com",
+        "http://signin.ebay.com.account-update.tk/ws/eBayISAPI.dll?SignIn&ru=https%3A%2F%2Fwww.ebay.com",
+        # Suspicious keywords + bad structure
+        "http://secure-login-verify.com/banking/update?account=true",
+        "http://confirm-your-account.com/password/reset?token=xyz",
+        "http://update-payment-info.com/signin?redirect=paypal",
+        "http://verify-identity-now.com/account/banking",
+        "http://account-suspended-action.com/login?user=target",
+        # Custom port phishing
+        "http://paypal.com.phishing.com:8080/login",
+        "http://secure-banking.com:9090/signin",
+        "http://account-verify.com:8443/banking",
+        # African bank impersonation (contextually relevant)
+        "http://gtb-alert-verify.tk/login",
+        "http://zenith-bank-secure.xyz/signin",
+        "http://access-bank-update.ml/verify",
+        "http://uba-account-alert.ga/confirm",
+        "http://firstbank-secure-login.top/account",
+    ]
+
     _cache = {}
+
     def _cached_extract(url):
         if url not in _cache:
             _cache[url] = extract_features(url)
         return _cache[url]
 
     rows = []
-    for _ in range(n // 2):
-        url = legit_urls[np.random.randint(len(legit_urls))]
+
+    # Generate 1500 legitimate samples with variation
+    for i in range(1500):
+        url = legit_urls[i % len(legit_urls)]
         feats = dict(_cached_extract(url))
         feats["label"] = 0
         rows.append(feats)
 
-    for _ in range(n // 2):
-        url = phish_urls[np.random.randint(len(phish_urls))]
+    # Generate 1500 phishing samples with variation
+    for i in range(1500):
+        url = phish_urls[i % len(phish_urls)]
         feats = dict(_cached_extract(url))
         feats["label"] = 1
         rows.append(feats)

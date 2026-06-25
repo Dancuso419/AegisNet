@@ -11,6 +11,7 @@ FEATURE_COLUMNS = [
     "is_shortened", "has_suspicious_keyword", "has_port", "longest_word_length",
     "num_digits", "digit_ratio", "has_double_slash_path", "suspicious_tld",
     "domain_age_days", "domain_registration_length", "whois_success",
+    "has_brand_impersonation",
 ]
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "ml", "model.pkl")
