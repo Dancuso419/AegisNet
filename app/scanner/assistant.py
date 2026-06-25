@@ -1,3 +1,4 @@
+import os
 import logging
 import google.generativeai as genai
 from flask import current_app
@@ -26,7 +27,26 @@ FALLBACK = "I am having trouble connecting right now. Please try again in a mome
 
 
 def _configure():
-    genai.configure(api_key=current_app.config["GEMINI_API_KEY"])
+    # Read the key from config first, then fall back to the env var names the
+    # Google SDK itself recognises. Strip whitespace in case it was pasted with
+    # a trailing newline/space in the hosting dashboard.
+    key = (
+        current_app.config.get("GEMINI_API_KEY")
+        or os.environ.get("GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_API_KEY")
+        or ""
+    ).strip()
+
+    if not key:
+        raise RuntimeError(
+            "GEMINI_API_KEY is empty. Set it in your host's Environment "
+            "settings (the value must be the actual key from "
+            "https://aistudio.google.com/apikey), then redeploy."
+        )
+
+    logger.info("Gemini configured with key length=%d, model=%s",
+                len(key), current_app.config.get("GEMINI_MODEL"))
+    genai.configure(api_key=key)
     return genai.GenerativeModel(current_app.config["GEMINI_MODEL"])
 
 
