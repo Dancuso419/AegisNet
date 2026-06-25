@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: aegisnet
+    runtime: python
+    buildCommand: pip install --no-cache-dir -r requirements.txt && python ml/train.py
+    startCommand: gunicorn --config gunicorn_config.py "app:create_app()"
+    envVars:
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///aegisnet.db
+      - key: GEMINI_MODEL
+        value: gemini-flash-lite-latest
+      - key: GEMINI_API_KEY
+        sync: false
