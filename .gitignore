@@ -1,0 +1,30 @@
+# Secrets & environment
+.env
+*.env
+
+# Database
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Trained model artifacts (regenerate with: python ml/train.py)
+*.pkl
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Playwright / test artifacts
+*.png.tmp
+node_modules/

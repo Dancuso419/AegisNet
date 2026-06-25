@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Scan History — AegisNet{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Scan History</h1>
+    <p class="page-subtitle">Your last {{ scans|length }} URL scans</p>
+  </div>
+  <a href="{{ url_for('scanner.index') }}" class="btn-header">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    New Scan
+  </a>
+</div>
+
+<div class="content-pad">
+  {% if scans %}
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Verdict</th>
+          <th>Confidence</th>
+          <th>Date &amp; Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for scan in scans %}
+        <tr class="table-row">
+          <td class="td-url">
+            <div class="url-cell">
+              <div class="url-scheme">{{ scan.url.split('://')[0] }}://</div>
+              <div class="url-path" title="{{ scan.url }}">{{ scan.url.split('://')[-1] }}</div>
+            </div>
+          </td>
+          <td>
+            <span class="verdict-pill verdict-pill--{{ 'danger' if scan.verdict == 'Phishing' else 'safe' }}">
+              {% if scan.verdict == 'Phishing' %}
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              </svg>
+              {% else %}
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              {% endif %}
+              {{ scan.verdict }}
+            </span>
+          </td>
+          <td>
+            <div class="conf-cell">
+              <div class="conf-bar">
+                <div class="conf-fill conf-fill--{{ 'danger' if scan.verdict == 'Phishing' else 'safe' }}"
+                     style="width: {{ scan.confidence }}%"></div>
+              </div>
+              <span class="conf-num">{{ scan.confidence }}%</span>
+            </div>
+          </td>
+          <td class="td-date">{{ scan.timestamp.strftime('%b %d, %Y') }}<span class="td-time">{{ scan.timestamp.strftime('%H:%M') }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="page-empty">
+    <div class="page-empty-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+    </div>
+    <p class="page-empty-title">No scans recorded yet</p>
+    <p class="page-empty-sub">Your scan history will appear here after you analyze your first URL.</p>
+    <a href="{{ url_for('scanner.index') }}" class="btn-header" style="margin-top: 20px; display: inline-flex;">Start Scanning</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

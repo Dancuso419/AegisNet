@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Register — AegisNet{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 4L42 11V25C42 36 34 43 24 46C14 43 6 36 6 25V11L24 4Z"
+              fill="rgba(244,121,32,0.07)" stroke="#f47920" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="24" cy="26" r="9" stroke="#f47920" stroke-width="1.6"/>
+        <circle cx="24" cy="26" r="3" fill="#f47920"/>
+      </svg>
+    </div>
+
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-subtitle">Start protecting your enterprise with AegisNet</p>
+
+    <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="form-group">
+        <label class="form-label" for="email">Work email</label>
+        <input id="email" name="email" type="email" class="form-input"
+               placeholder="you@company.com" autocomplete="email" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input id="password" name="password" type="password" class="form-input"
+               placeholder="Min. 8 characters" autocomplete="new-password" minlength="8" required />
+        <p class="form-helper">Must be at least 8 characters</p>
+      </div>
+      <button type="submit" class="btn-auth">Create Account</button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a href="{{ url_for('auth.login') }}" class="link">Sign in</a>
+    </p>
+  </div>
+
+  <p class="auth-brand-note">AegisNet &mdash; AI-Powered Phishing Intelligence</p>
+</div>
+{% endblock %}

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AegisNet — AI-Powered Phishing Link Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}" />
+</head>
+<body>
+
+<!-- Ambient background -->
+<div class="bg-fx" aria-hidden="true">
+  <div class="bg-grid"></div>
+  <div class="bg-blob bg-blob--1"></div>
+  <div class="bg-blob bg-blob--2"></div>
+  <div class="bg-noise"></div>
+</div>
+
+<!-- ── Nav ── -->
+<header class="lp-nav" id="lp-nav">
+  <a href="{{ url_for('scanner.landing') }}" class="lp-brand">
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 2L26 6.5V15.5C26 22 21.5 27 15 29C8.5 27 4 22 4 15.5V6.5L15 2Z"
+            fill="rgba(244,121,32,0.07)" stroke="#f47920" stroke-width="1.4" stroke-linejoin="round"/>
+      <circle cx="15" cy="16" r="5.5" stroke="#f47920" stroke-width="1.4"/>
+      <circle cx="15" cy="16" r="1.8" fill="#f47920"/>
+    </svg>
+    <span>AegisNet</span>
+  </a>
+
+  <nav class="lp-nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#security">Security</a>
+  </nav>
+
+  <div class="lp-nav-actions">
+    <a href="{{ url_for('auth.login') }}" class="lp-link-ghost">Sign in</a>
+    <a href="{{ url_for('scanner.index') }}" class="lp-btn lp-btn--primary">
+      Launch App
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-text reveal">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      AI Threat Intelligence Platform
+    </div>
+    <h1 class="hero-title">
+      Know if a link<br>
+      <span class="hero-title-accent">is safe to click.</span>
+    </h1>
+    <p class="hero-sub">
+      AegisNet analyzes any URL with a trained machine-learning model and explains
+      the verdict in plain English — real-time phishing intelligence your whole
+      organization can trust.
+    </p>
+    <div class="hero-cta">
+      <a href="{{ url_for('scanner.index') }}" class="lp-btn lp-btn--primary lp-btn--lg">
+        Scan a URL free
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </a>
+      <a href="{{ url_for('scanner.dashboard') }}" class="lp-btn lp-btn--ghost lp-btn--lg">
+        View live dashboard
+      </a>
+    </div>
+    <div class="hero-trust">
+      <span class="hero-trust-stars">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#f47920"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9"/></svg>
+        24-feature analysis
+      </span>
+      <span class="hero-trust-sep"></span>
+      <span>Random Forest + SHAP explainability</span>
+    </div>
+  </div>
+
+  <!-- 3D scene -->
+  <div class="hero-scene" id="hero-scene" aria-hidden="true">
+    <div class="scene-stage" id="scene-stage">
+
+      <!-- Central rotating shield -->
+      <div class="shield3d">
+        <div class="shield3d-glow"></div>
+        <div class="shield3d-ring shield3d-ring--1"></div>
+        <div class="shield3d-ring shield3d-ring--2"></div>
+        <div class="shield3d-core">
+          <svg width="150" height="150" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 2L26 6.5V15.5C26 22 21.5 27 15 29C8.5 27 4 22 4 15.5V6.5L15 2Z"
+                  fill="rgba(244,121,32,0.10)" stroke="#f47920" stroke-width="1.1" stroke-linejoin="round"/>
+            <circle cx="15" cy="16" r="5.5" stroke="#f47920" stroke-width="1.1"/>
+            <circle cx="15" cy="16" r="1.8" fill="#f47920"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Floating glass cards -->
+      <div class="float-card float-card--verdict" data-depth="60">
+        <div class="fc-row">
+          <span class="fc-badge fc-badge--danger">Phishing</span>
+          <span class="fc-conf">100%</span>
+        </div>
+        <div class="fc-url">secure-banking-update.tk/signin</div>
+      </div>
+
+      <div class="float-card float-card--metric" data-depth="40">
+        <div class="fc-metric-value">2,847</div>
+        <div class="fc-metric-label">Threats blocked</div>
+      </div>
+
+      <div class="float-card float-card--signal" data-depth="80">
+        <div class="fc-signal-row"><span class="fc-dot fc-dot--bad"></span> Suspicious TLD</div>
+        <div class="fc-signal-row"><span class="fc-dot fc-dot--bad"></span> No HTTPS</div>
+        <div class="fc-signal-row"><span class="fc-dot fc-dot--good"></span> Domain verified</div>
+      </div>
+
+      <div class="float-card float-card--safe" data-depth="50">
+        <span class="fc-badge fc-badge--safe">Legitimate</span>
+        <div class="fc-url">www.google.com</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Trust marquee ── -->
+<section class="marquee-wrap reveal">
+  <p class="marquee-label">Built for security teams across the enterprise</p>
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>FINANCE</span><span>HEALTHCARE</span><span>GOVERNMENT</span><span>EDUCATION</span><span>RETAIL</span><span>FINTECH</span><span>INSURANCE</span><span>LOGISTICS</span>
+      <span>FINANCE</span><span>HEALTHCARE</span><span>GOVERNMENT</span><span>EDUCATION</span><span>RETAIL</span><span>FINTECH</span><span>INSURANCE</span><span>LOGISTICS</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ── -->
+<section class="section" id="features">
+  <div class="section-head reveal">
+    <h2 class="section-title">Everything you need to<br>neutralize phishing threats</h2>
+    <p class="section-lead">A complete detection pipeline — from feature extraction to an AI assistant that explains every verdict in human terms.</p>
+  </div>
+
+  <div class="feature-grid">
+    <article class="feature-card tilt reveal" data-span="2">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f47920" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <h3 class="feature-title">24-feature URL analysis</h3>
+      <p class="feature-text">Every link is broken down into 24 structural signals — TLD reputation, domain age, suspicious keywords, IP usage, and more — then scored by a trained Random Forest model.</p>
+      <div class="feature-chips">
+        <span>Suspicious TLD</span><span>Domain age</span><span>HTTPS</span><span>Shorteners</span><span>+20 more</span>
+      </div>
+    </article>
+
+    <article class="feature-card tilt reveal">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f47920" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+      </div>
+      <h3 class="feature-title">AI assistant</h3>
+      <p class="feature-text">A Gemini-powered assistant explains each verdict in plain English and answers any cybersecurity question.</p>
+    </article>
+
+    <article class="feature-card tilt reveal">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f47920" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h3 class="feature-title">SHAP explainability</h3>
+      <p class="feature-text">See exactly which signals drove the decision, ranked by contribution — no black-box guesses.</p>
+    </article>
+
+    <article class="feature-card tilt reveal" data-span="2">
+      <div class="feature-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f47920" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      <h3 class="feature-title">Live threat dashboard</h3>
+      <p class="feature-text">A real-time command center showing total scans, threats detected, your security score, and a live feed of every URL analyzed across the platform.</p>
+      <div class="feature-chips">
+        <span>Threat distribution</span><span>Security score</span><span>Live feed</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section class="section" id="how">
+  <div class="section-head reveal">
+    <h2 class="section-title">Three steps to a verdict</h2>
+    <p class="section-lead">Paste a link, let the model work, and get an answer you can actually understand.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step tilt reveal">
+      <div class="step-num">01</div>
+      <h3 class="step-title">Submit any URL</h3>
+      <p class="step-text">Drop a suspicious link into the scanner. AegisNet validates and parses it instantly.</p>
+    </div>
+    <div class="step-line reveal"></div>
+    <div class="step tilt reveal">
+      <div class="step-num">02</div>
+      <h3 class="step-title">AI analyzes 24 signals</h3>
+      <p class="step-text">The trained model extracts structural features and classifies the link in milliseconds.</p>
+    </div>
+    <div class="step-line reveal"></div>
+    <div class="step tilt reveal">
+      <div class="step-num">03</div>
+      <h3 class="step-title">Get an explained verdict</h3>
+      <p class="step-text">A confidence score, risk signals, and a plain-English explanation from the AI assistant.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats band ── -->
+<section class="stats-band reveal" id="security">
+  <div class="stats-band-inner">
+    <div class="stat-block">
+      <div class="stat-num" data-count="24">24</div>
+      <div class="stat-cap">URL features analyzed</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" data-count="100">100</div>
+      <div class="stat-cap">Decision trees in the model</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" data-suffix="ms" data-count="900">900</div>
+      <div class="stat-cap">Typical scan time</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" data-suffix="%" data-count="100">100</div>
+      <div class="stat-cap">Explainable verdicts</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Final CTA ── -->
+<section class="cta-final reveal">
+  <div class="cta-card tilt">
+    <div class="cta-glow"></div>
+    <h2 class="cta-title">Catch the next phishing link<br>before it costs you.</h2>
+    <p class="cta-sub">Start scanning in seconds. No setup, no credit card.</p>
+    <div class="hero-cta">
+      <a href="{{ url_for('scanner.index') }}" class="lp-btn lp-btn--primary lp-btn--lg">Launch AegisNet</a>
+      <a href="{{ url_for('auth.register') }}" class="lp-btn lp-btn--ghost lp-btn--lg">Create account</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="lp-footer">
+  <div class="lp-footer-top">
+    <a href="{{ url_for('scanner.landing') }}" class="lp-brand">
+      <svg width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 2L26 6.5V15.5C26 22 21.5 27 15 29C8.5 27 4 22 4 15.5V6.5L15 2Z" fill="rgba(244,121,32,0.07)" stroke="#f47920" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="15" cy="16" r="5.5" stroke="#f47920" stroke-width="1.4"/>
+        <circle cx="15" cy="16" r="1.8" fill="#f47920"/>
+      </svg>
+      <span>AegisNet</span>
+    </a>
+    <nav class="lp-footer-links">
+      <a href="{{ url_for('scanner.index') }}">Scanner</a>
+      <a href="{{ url_for('scanner.dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('auth.login') }}">Sign in</a>
+      <a href="{{ url_for('auth.register') }}">Register</a>
+    </nav>
+  </div>
+  <div class="lp-footer-bottom">
+    <span>AegisNet — AI-Based Phishing Link Detection System</span>
+    <span>Ezenduka Johncollins · Chukwuemeka Odumegwu Ojukwu University</span>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/landing.js') }}" defer></script>
+</body>
+</html>

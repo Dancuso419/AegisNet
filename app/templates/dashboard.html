@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AegisNet{% endblock %}
+
+{% block content %}
+
+{# ── Donut chart math ── #}
+{% set circ = 439.82 %}
+{% if total_scans > 0 %}
+  {% set phishing_len = (phishing_count / total_scans) * circ %}
+  {% set legit_len    = (legit_count    / total_scans) * circ %}
+  {% set start_off    = circ / 4 %}
+  {% set phish_off    = circ / 4 - legit_len %}
+{% else %}
+  {% set phishing_len = 0 %}
+  {% set legit_len    = 0 %}
+  {% set start_off    = 0 %}
+  {% set phish_off    = 0 %}
+{% endif %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Platform-wide threat intelligence overview</p>
+  </div>
+  <a href="{{ url_for('scanner.index') }}" class="btn-header">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Scan URL
+  </a>
+</div>
+
+<!-- ── Stats Row ── -->
+<div class="stats-grid">
+  <div class="stat-card" style="--card-accent: var(--accent);">
+    <div class="stat-icon stat-icon--accent">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </div>
+    <div class="stat-label">Total Scans</div>
+    <div class="stat-value">{{ total_scans }}</div>
+    <div class="stat-sub">URLs analyzed</div>
+  </div>
+
+  <div class="stat-card" style="--card-accent: var(--danger);">
+    <div class="stat-icon stat-icon--danger">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="stat-label">Threats Detected</div>
+    <div class="stat-value stat-value--danger">{{ phishing_count }}</div>
+    <div class="stat-sub">Phishing URLs flagged</div>
+  </div>
+
+  <div class="stat-card" style="--card-accent: var(--safe);">
+    <div class="stat-icon stat-icon--safe">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+    <div class="stat-label">Safe URLs</div>
+    <div class="stat-value stat-value--safe">{{ legit_count }}</div>
+    <div class="stat-sub">Legitimate links</div>
+  </div>
+
+  <div class="stat-card" style="--card-accent: var(--warning);">
+    <div class="stat-icon stat-icon--warning">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <div class="stat-label">Threat Rate</div>
+    <div class="stat-value stat-value--warning">{{ threat_rate }}%</div>
+    <div class="stat-sub">Of scans flagged</div>
+  </div>
+</div>
+
+<!-- ── Main Content Grid ── -->
+<div class="dash-grid">
+
+  <!-- Threat Distribution Card -->
+  <div class="dash-card dash-card--chart">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Threat Distribution</h2>
+        <p class="card-subtitle">Phishing vs. legitimate URL breakdown</p>
+      </div>
+      <div class="security-badge {% if security_score >= 70 %}security-badge--good{% elif security_score >= 40 %}security-badge--warn{% else %}security-badge--bad{% endif %}">
+        {{ security_score }}/100
+      </div>
+    </div>
+
+    <div class="chart-area">
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 200 200" width="200" height="200" aria-label="Threat distribution chart">
+          <!-- Track -->
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="18"/>
+          {% if total_scans > 0 %}
+          <!-- Legitimate segment -->
+          <circle cx="100" cy="100" r="70" fill="none"
+            stroke="#10b981" stroke-width="18"
+            stroke-dasharray="{{ legit_len }} {{ circ }}"
+            stroke-dashoffset="{{ start_off }}"
+            stroke-linecap="butt"/>
+          <!-- Phishing segment -->
+          <circle cx="100" cy="100" r="70" fill="none"
+            stroke="#ef4444" stroke-width="18"
+            stroke-dasharray="{{ phishing_len }} {{ circ }}"
+            stroke-dashoffset="{{ phish_off }}"
+            stroke-linecap="butt"/>
+          {% else %}
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="18" stroke-dasharray="220 220"/>
+          {% endif %}
+          <!-- Center label -->
+          <text x="100" y="91" text-anchor="middle" fill="#f4f4f5" font-size="30" font-weight="700" font-family="Outfit, sans-serif">{{ total_scans }}</text>
+          <text x="100" y="112" text-anchor="middle" fill="#64748b" font-size="11" font-family="Outfit, sans-serif">URLs Analyzed</text>
+        </svg>
+      </div>
+
+      <div class="chart-legend">
+        <div class="legend-item">
+          <span class="legend-dot legend-dot--safe"></span>
+          <div class="legend-info">
+            <span class="legend-label">Legitimate</span>
+            <span class="legend-count">{{ legit_count }}</span>
+          </div>
+          <span class="legend-pct">{{ "%.1f"|format((legit_count / total_scans * 100) if total_scans else 0) }}%</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot legend-dot--danger"></span>
+          <div class="legend-info">
+            <span class="legend-label">Phishing</span>
+            <span class="legend-count">{{ phishing_count }}</span>
+          </div>
+          <span class="legend-pct">{{ "%.1f"|format((phishing_count / total_scans * 100) if total_scans else 0) }}%</span>
+        </div>
+
+        <div class="security-score-block">
+          <div class="score-label">Security Score</div>
+          <div class="score-bar-wrap">
+            <div class="score-bar">
+              <div class="score-fill {% if security_score >= 70 %}score-fill--good{% elif security_score >= 40 %}score-fill--warn{% else %}score-fill--bad{% endif %}"
+                   style="width: {{ security_score }}%"></div>
+            </div>
+            <span class="score-num">{{ security_score }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if total_scans == 0 %}
+    <div class="chart-empty">
+      <p>No scan data yet. <a href="{{ url_for('scanner.index') }}" class="link">Scan your first URL</a> to see analytics.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Scans Card -->
+  <div class="dash-card dash-card--recent">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Live Feed</h2>
+        <p class="card-subtitle">Most recent URL scans</p>
+      </div>
+      <div class="live-dot-wrap">
+        <span class="live-dot"></span>
+        <span class="live-label">Live</span>
+      </div>
+    </div>
+
+    {% if recent_scans %}
+    <ul class="scan-feed">
+      {% for scan in recent_scans %}
+      <li class="feed-item">
+        <div class="feed-icon {% if scan.verdict == 'Phishing' %}feed-icon--danger{% else %}feed-icon--safe{% endif %}">
+          {% if scan.verdict == 'Phishing' %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          </svg>
+          {% else %}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          {% endif %}
+        </div>
+        <div class="feed-url" title="{{ scan.url }}">{{ scan.url }}</div>
+        <div class="feed-right">
+          <span class="verdict-pill verdict-pill--{{ 'danger' if scan.verdict == 'Phishing' else 'safe' }}">
+            {{ scan.verdict }}
+          </span>
+          <span class="feed-conf">{{ scan.confidence }}%</span>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="feed-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feed-empty-icon">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <p>No scans yet. Start by analyzing a URL.</p>
+      <a href="{{ url_for('scanner.index') }}" class="btn-outline-sm">Go to Scanner</a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

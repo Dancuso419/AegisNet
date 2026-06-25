@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}URL Scanner — AegisNet{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">URL Scanner</h1>
+    <p class="page-subtitle">Analyze any link for phishing signals using AI-powered detection</p>
+  </div>
+  {% if current_user.is_authenticated %}
+  <a href="{{ url_for('scanner.history') }}" class="btn-header btn-header--ghost">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+    View History
+  </a>
+  {% endif %}
+</div>
+
+<!-- ── URL Input Bar ── -->
+<div class="scan-bar-wrap">
+  <form id="scan-form" class="scan-bar" novalidate>
+    <span class="scan-bar-icon" aria-hidden="true">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+    </span>
+    <label class="sr-only" for="url-input">URL to scan</label>
+    <input
+      id="url-input"
+      type="url"
+      class="scan-bar-input"
+      placeholder="Paste a URL to scan — e.g. https://example.com/login"
+      autocomplete="off"
+      spellcheck="false"
+      required
+    />
+    <button id="scan-btn" type="submit" class="scan-bar-btn">
+      <span class="btn-label">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Analyze
+      </span>
+      <span class="btn-spinner" aria-hidden="true"></span>
+    </button>
+  </form>
+  <p id="url-error" class="field-error" role="alert" aria-live="polite"></p>
+</div>
+
+<!-- ── Results + Chat Grid ── -->
+<div class="scanner-grid">
+
+  <!-- Scanner Panel -->
+  <section class="scan-panel panel--scanner" aria-label="Scan results">
+
+    <!-- Empty state -->
+    <div id="empty-state" class="scan-empty">
+      <div class="scan-empty-visual">
+        <svg width="64" height="64" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M24 4L42 11V25C42 36 34 43 24 46C14 43 6 36 6 25V11L24 4Z"
+                fill="rgba(244,121,32,0.05)" stroke="rgba(244,121,32,0.3)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="24" cy="26" r="9" stroke="rgba(244,121,32,0.3)" stroke-width="1.6"/>
+          <circle cx="24" cy="26" r="3" fill="rgba(244,121,32,0.3)"/>
+        </svg>
+      </div>
+      <p class="scan-empty-title">Ready to scan</p>
+      <p class="scan-empty-sub">Enter any URL above to detect phishing signals.<br>Results appear here in seconds.</p>
+    </div>
+
+    <!-- Result panel — hidden until a scan completes -->
+    <div id="result-panel" class="result-panel" hidden>
+
+      <!-- Hero: confidence gauge + verdict -->
+      <div class="result-hero">
+        <div class="gauge" role="img" aria-label="Confidence gauge">
+          <svg viewBox="0 0 120 120" width="118" height="118">
+            <circle class="gauge-track" cx="60" cy="60" r="52" />
+            <circle id="gauge-fill" class="gauge-fill" cx="60" cy="60" r="52"
+                    stroke-dasharray="326.7" stroke-dashoffset="326.7"
+                    transform="rotate(-90 60 60)" />
+          </svg>
+          <div class="gauge-center">
+            <span id="gauge-value" class="gauge-value">0%</span>
+            <span class="gauge-sub">confidence</span>
+          </div>
+        </div>
+
+        <div class="result-hero-info">
+          <div id="verdict-badge" class="verdict-badge" role="status" aria-live="polite"></div>
+          <p id="verdict-summary" class="verdict-summary"></p>
+          <div id="scanned-url" class="scanned-url"></div>
+        </div>
+      </div>
+
+      <!-- Risk signal chips -->
+      <div class="result-section">
+        <h3 class="section-label">Risk Signals</h3>
+        <div id="risk-signals" class="risk-grid"></div>
+      </div>
+
+      <!-- Top contributing signals as bars -->
+      <div class="result-section">
+        <h3 class="section-label">Top Contributing Signals</h3>
+        <ul id="top-features-list" class="shap-bars"></ul>
+      </div>
+
+      <!-- URL anatomy stat tiles -->
+      <div class="result-section">
+        <h3 class="section-label">URL Anatomy</h3>
+        <div id="url-stats" class="stat-tiles"></div>
+      </div>
+
+      <details class="result-details">
+        <summary class="result-details-toggle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+          All 24 features
+        </summary>
+        <ul id="all-features-list" class="features-list features-list--grid"></ul>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- Chat Panel -->
+  <section class="chat-panel panel--chat" aria-label="AI Assistant">
+    <div class="chat-header">
+      <div class="chat-header-brand">
+        <span class="chat-dot"></span>
+        <span class="chat-header-title">AegisNet Assistant</span>
+      </div>
+      <span class="chat-header-sub">Powered by Gemini AI</span>
+    </div>
+
+    <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+      <div class="chat-bubble chat-bubble--assistant">
+        <div class="bubble-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+            <path d="M24 4L42 11V25C42 36 34 43 24 46C14 43 6 36 6 25V11L24 4Z"
+                  fill="rgba(244,121,32,0.1)" stroke="#f47920" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="24" cy="26" r="9" stroke="#f47920" stroke-width="2"/>
+            <circle cx="24" cy="26" r="3" fill="#f47920"/>
+          </svg>
+        </div>
+        <p>Hi, I'm your cybersecurity assistant. Paste a URL above and I'll explain the threat analysis — or ask me any question about phishing.</p>
+      </div>
+    </div>
+
+    <div id="typing-indicator" class="typing-indicator" hidden aria-label="Assistant is typing">
+      <span></span><span></span><span></span>
+    </div>
+
+    <form id="chat-form" class="chat-form" novalidate>
+      <label class="sr-only" for="chat-input">Message</label>
+      <input
+        id="chat-input"
+        type="text"
+        class="chat-input"
+        placeholder="Ask about phishing or the scan result..."
+        autocomplete="off"
+      />
+      <button type="submit" class="btn btn--send" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </form>
+  </section>
+
+</div>
+{% endblock %}
