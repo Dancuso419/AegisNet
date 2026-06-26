@@ -1004,51 +1004,125 @@ body.drawer-open .app-topbar-toggle span:nth-child(3) { transform: translateY(-7
 
 .risk-label { flex: 1; }
 
-/* ── SHAP contribution bars ── */
+/* ── Section label row (label + hint) ── */
+.section-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.section-label-row .section-label { margin-bottom: 0; }
+.section-hint {
+  font-size: 10.5px;
+  color: var(--text-3);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* ── SHAP contribution cards ── */
 .shap-bars {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
 }
 
-.shap-row { display: flex; flex-direction: column; gap: 6px; }
+.shap-card {
+  display: flex;
+  gap: 11px;
+  padding: 11px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left-width: 2px;
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.shap-card:hover { background: rgba(255, 255, 255, 0.03); }
+.shap-card--pos { border-left-color: var(--danger); }
+.shap-card--neg { border-left-color: var(--safe); }
 
-.shap-head {
+.shap-card-icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  margin-top: 1px;
+}
+.shap-card-icon--pos { color: var(--danger); background: rgba(239, 68, 68, 0.12); }
+.shap-card-icon--neg { color: var(--safe);   background: rgba(16, 185, 129, 0.12); }
+
+.shap-card-body { flex: 1; min-width: 0; }
+
+.shap-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+  margin-bottom: 3px;
 }
 
-.shap-name {
-  font-size: 12.5px;
-  color: var(--text-2);
-  font-weight: 500;
-}
-
-.shap-val {
-  font-family: var(--mono);
-  font-size: 11.5px;
+.shap-card-name {
+  font-size: 13px;
   font-weight: 600;
+  color: var(--text);
 }
-.shap-val--pos { color: var(--danger); }
-.shap-val--neg { color: var(--safe); }
 
-.shap-track {
-  height: 7px;
-  background: var(--surface-2);
+.shap-card-tag {
+  flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+.shap-card-tag--pos { color: var(--danger); background: rgba(239, 68, 68, 0.12); }
+.shap-card-tag--neg { color: var(--safe);   background: rgba(16, 185, 129, 0.12); }
+
+.shap-card-desc {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text-2);
+  margin: 0 0 9px;
+}
+
+.shap-card-meter {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.shap-card-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 99px;
   overflow: hidden;
 }
 
-.shap-fill {
+.shap-card-fill {
   height: 100%;
+  width: 0;
   border-radius: 99px;
-  transition: width 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.shap-fill--pos { background: linear-gradient(90deg, rgba(239,68,68,0.4), var(--danger)); }
-.shap-fill--neg { background: linear-gradient(90deg, rgba(16,185,129,0.4), var(--safe)); }
+.shap-card-fill--pos { background: linear-gradient(90deg, rgba(239,68,68,0.5), var(--danger)); }
+.shap-card-fill--neg { background: linear-gradient(90deg, rgba(16,185,129,0.5), var(--safe)); }
+
+.shap-card-val {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 44px;
+  text-align: right;
+}
+.shap-card-val--pos { color: var(--danger); }
+.shap-card-val--neg { color: var(--safe); }
 
 /* ── URL anatomy stat tiles ── */
 .stat-tiles {
